@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Re:use 모바일 체험형 프로토타입</title>
+  <style>
+    :root {
+      --green:#0B7A32;
+      --light:#EAF7EE;
+      --soft:#F6FBF7;
+      --text:#111;
+      --gray:#666;
+      --line:#E2E8E3;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin:0;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+      background: var(--light);
+      color: var(--text);
+    }
+    .wrap {
+      width:100%;
+      max-width:430px;
+      min-height:100vh;
+      margin:0 auto;
+      background:#fff;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 0 30px rgba(0,0,0,.08);
+    }
+    .screen {
+      min-height:100vh;
+      padding:22px 20px 86px;
+      animation: fade .22s ease;
+    }
+    @keyframes fade { from {opacity:.4; transform:translateX(8px)} to {opacity:1; transform:translateX(0)} }
+    .top {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .logo {
+      font-size:30px;
+      font-weight:900;
+      color:var(--green);
+      letter-spacing:-1px;
+    }
+    .back {
+      background:#fff;
+      color:var(--green);
+      border:1px solid var(--line);
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      font-size:20px;
+    }
+    h1 {
+      font-size:28px;
+      line-height:1.22;
+      margin:8px 0 8px;
+      letter-spacing:-1.2px;
+    }
+    h2 { font-size:21px; margin:12px 0; letter-spacing:-.6px; }
+    h3 { font-size:17px; margin:10px 0; }
+    p { line-height:1.55; }
+    .sub { color:var(--gray); font-size:14px; line-height:1.55; }
+    .search {
+      margin:20px 0 16px;
+      background:#F7F8F7;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      display:flex;
+      justify-content:space-between;
+      color:#777;
+      font-size:15px;
+    }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    button {
+      border:0;
+      border-radius:16px;
+      padding:15px 16px;
+      background:var(--green);
+      color:#fff;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .outline {
+      background:#fff;
+      color:var(--green);
+      border:1px solid var(--green);
+    }
+    .card {
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:16px;
+      margin:12px 0;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+    }
+    .soft { background:var(--soft); }
+    .product {
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .thumb {
+      width:62px;
+      height:76px;
+      border-radius:16px;
+      background:#EEF2F0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:34px;
+      flex-shrink:0;
+    }
+    .score {
+      margin-left:auto;
+      width:64px;
+      height:64px;
+      border-radius:50%;
+      border:7px solid var(--green);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      font-size:20px;
+    }
+    .pill {
+      display:inline-block;
+      background:var(--light);
+      color:var(--green);
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      margin-top:6px;
+    }
+    .bigscore {
+      text-align:center;
+      font-size:62px;
+      font-weight:900;
+      color:var(--green);
+      line-height:1;
+      margin-top:8px;
+    }
+    .metric {
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      min-height:98px;
+    }
+    .metric b { display:block; font-size:13px; color:#333; margin-bottom:8px; }
+    .metric span { color:var(--green); font-size:24px; font-weight:900; }
+    .option {
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      margin:10px 0;
+      cursor:pointer;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-weight:700;
+    }
+    .option.active {
+      border:2px solid var(--green);
+      background:var(--soft);
+      color:var(--green);
+    }
+    .result {
+      text-align:center;
+      background:var(--soft);
+      border-radius:24px;
+      padding:22px 16px;
+      margin:16px 0;
+    }
+    .result .icon { font-size:44px; }
+    .row {
+      display:flex;
+      gap:12px;
+    }
+    .row > .card { flex:1; }
+    .money {
+      font-size:26px;
+      font-weight:900;
+      color:var(--green);
+      letter-spacing:-1px;
+    }
+    .bars {
+      height:230px;
+      display:flex;
+      gap:34px;
+      align-items:flex-end;
+      justify-content:center;
+      margin:18px 0;
+    }
+    .bar {
+      width:88px;
+      border-radius:14px 14px 0 0;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding-top:12px;
+      font-weight:900;
+    }
+    .bar.gray { height:190px; background:#DDE1DF; }
+    .bar.green { height:124px; background:var(--green); color:white; }
+    .barLabel { text-align:center; font-size:13px; margin-top:8px; color:#444; }
+    .shop {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+    }
+    .shop button { padding:10px 14px; min-width:64px; }
+    .progress {
+      height:8px;
+      background:#EAEAEA;
+      border-radius:999px;
+      margin:12px 0 18px;
+      overflow:hidden;
+    }
+    .progress div {
+      height:100%;
+      background:var(--green);
+      width:var(--w);
+      border-radius:999px;
+    }
+    .nav {
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:0;
+      width:100%;
+      max-width:430px;
+      height:72px;
+      background:#fff;
+      border-top:1px solid var(--line);
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      font-size:11px;
+      color:#777;
+      z-index:5;
+    }
+    .nav div { text-align:center; line-height:1.35; }
+    .nav .active { color:var(--green); font-weight:900; }
+    .cta {
+      width:100%;
+      margin-top:16px;
+      box-shadow:0 8px 16px rgba(11,122,50,.18);
+    }
+    .mini { font-size:13px; color:#666; line-height:1.5; }
+    .center { text-align:center; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="screen" id="app"></section>
+    <nav class="nav">
+      <div class="active">🏠<br>홈</div>
+      <div>🔍<br>검색</div>
+      <div>🛠️<br>진단</div>
+      <div>📍<br>수리점</div>
+      <div>👤<br>MY</div>
+    </nav>
+  </main>
+
+<script>
+let selectedProblem = "전원이 켜지지 않아요";
+const app = document.getElementById("app");
+
+function topBar(title, backFn) {
+  return `<div class="top">
+    ${backFn ? `<button class="back" onclick="${backFn}">‹</button>` : `<div class="logo">Re:use</div>`}
+    <b>${title || ""}</b>
+    <span style="color:#0B7A32;font-weight:800;">${backFn ? "공유" : "🔔"}</span>
+  </div>`;
+}
+
+function renderHome(){
+  app.innerHTML = `
+    ${topBar()}
+    <h1>고장난 제품,<br>수리할지 살지 고민될 때</h1>
+    <p class="sub">제품을 검색하고 수리 가능성, 예상 수리비, 환경 절감 효과를 한 번에 확인해보세요.</p>
+    <div class="search" onclick="renderProduct()">🔍 갤럭시 S21 검색하기 <span>⌗</span></div>
+    <div class="grid">
+      <button onclick="renderProduct()">제품명 검색</button>
+      <button class="outline" onclick="renderProduct()">바코드 스캔</button>
+    </div>
+
+    <h2>추천 제품</h2>
+    <div class="card product" onclick="renderProduct()">
+      <div class="thumb">📱</div>
+      <div>
+        <b>갤럭시 S21</b><br>
+        <span class="mini">SM-G991N · 삼성전자</span><br>
+        <span class="pill">수리 가능성 높음</span>
+      </div>
+      <div class="score">85</div>
+    </div>
+
+    <div class="card product">
+      <div class="thumb">💻</div>
+      <div>
+        <b>맥북 에어 M1</b><br>
+        <span class="mini">A2337 · Apple</span><br>
+        <span class="pill">부품 공급 확인</span>
+      </div>
+      <div class="score">78</div>
+    </div>
+  `;
+}
+
+function renderProduct(){
+  app.innerHTML = `
+    ${topBar("제품 개요", "renderHome()")}
+    <div class="product" style="margin-top:8px;">
+      <div class="thumb">📱</div>
+      <div>
+        <b style="font-size:23px;">갤럭시 S21</b><br>
+        <span class="mini">SM-G991N · 삼성전자</span>
+      </div>
+    </div>
+
+    <div class="card soft">
+      <div class="bigscore">85<span style="font-size:25px;">/100</span></div>
+      <p class="center"><b>수리 용이성이 높은 제품입니다.</b></p>
+      <p class="mini center">부품 교체와 수리 접근성이 비교적 좋은 편입니다.</p>
+    </div>
+
+    <div class="grid">
+      <div class="metric"><b>부품 공급</b><span>8년</span></div>
+      <div class="metric"><b>평균 수리비</b><span>7.8만</span></div>
+      <div class="metric"><b>예상 수명</b><span>5~6년</span></div>
+      <div class="metric"><b>수리 난이도</b><span>보통</span></div>
+    </div>
+    <button class="cta" onclick="renderDiagnosis()">자가 진단 시작하기</button>
+  `;
+}
+
+function renderDiagnosis(){
+  const problems = ["전원이 켜지지 않아요","충전이 되지 않아요","화면이 깨졌어요","이상한 소음이 나요","발열이 심해요","연결이 안 돼요"];
+  app.innerHTML = `
+    ${topBar("문제 진단", "renderProduct()")}
+    <div class="progress" style="--w:40%;"><div></div></div>
+    <h1>어떤 문제가<br>발생했나요?</h1>
+    <p class="sub">증상을 선택하면 예상 고장 부품과 수리비를 안내합니다.</p>
+    ${problems.map(p => `<div class="option ${p===selectedProblem?'active':''}" onclick="selectedProblem='${p}'; renderDiagnosis()"><span>${p}</span><span>${p===selectedProblem?'✓':''}</span></div>`).join("")}
+    <button class="cta" onclick="renderResult()">진단 결과 보기</button>
+  `;
+}
+
+function renderResult(){
+  app.innerHTML = `
+    ${topBar("진단 결과", "renderDiagnosis()")}
+    <div class="result">
+      <div class="icon">🔋</div>
+      <h2>배터리 성능 저하 가능성</h2>
+      <div class="bigscore" style="font-size:50px;">85%</div>
+      <p class="mini">전원이 켜지지 않는 증상과 사용 기간을 기준으로 추정한 결과입니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>예상 수리비</h3>
+      <div class="money">₩65,000 ~ ₩85,000</div>
+      <p class="mini">평균 수리비 약 ₩75,000</p>
+    </div>
+
+    <div class="card">
+      <h3>추천 대처</h3>
+      <p>공식 또는 인증 수리점에서 배터리 교체를 권장합니다.</p>
+    </div>
+    <button class="cta" onclick="renderCompare()">수리 vs 구매 비교하기</button>
+  `;
+}
+
+function renderCompare(){
+  app.innerHTML = `
+    ${topBar("수리 vs 구매", "renderResult()")}
+    <h1>어떤 선택이<br>더 합리적일까요?</h1>
+    <div class="row">
+      <div class="card">
+        <h3>수리</h3>
+        <div class="money">7.5만</div>
+        <p class="mini">추가 사용 약 2.5년</p>
+      </div>
+      <div class="card">
+        <h3>새 제품</h3>
+        <div class="money">93만</div>
+        <p class="mini">예상 사용 4~5년</p>
+      </div>
+    </div>
+
+    <div class="result">
+      <h2>수리 시 약 85만원 절약 가능</h2>
+      <p>현재 상태에서는 새 제품 구매보다 수리가 더 경제적입니다.</p>
+    </div>
+
+    <button class="cta" onclick="renderEnv()">환경 영향 확인하기</button>
+  `;
+}
+
+function renderEnv(){
+  app.innerHTML = `
+    ${topBar("환경 영향", "renderCompare()")}
+    <h1 class="center">탄소배출<br><span style="color:#0B7A32;">35% 감소</span></h1>
+    <p class="sub center">새 제품 구매 대비 약 32kg CO₂eq 절감</p>
+
+    <div class="bars">
+      <div>
+        <div class="bar gray">91kg</div>
+        <div class="barLabel">새 제품 구매</div>
+      </div>
+      <div>
+        <div class="bar green">59kg</div>
+        <div class="barLabel">수리 시</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="metric"><b>전자폐기물</b><span>1.2kg↓</span></div>
+      <div class="metric"><b>절약 금액</b><span>85만↓</span></div>
+      <div class="metric"><b>에너지</b><span>140kWh↓</span></div>
+      <div class="metric"><b>환경 점수</b><span>A</span></div>
+    </div>
+    <button class="cta" onclick="renderShops()">아주대 근처 수리점 보기</button>
+  `;
+}
+
+function renderShops(){
+  app.innerHTML = `
+    ${topBar("수리점 찾기", "renderEnv()")}
+    <h1>아주대 근처<br>수리점을 추천해드려요</h1>
+    <div class="card soft">
+      📍 현재 위치: 아주대학교<br>
+      <span class="mini">갤럭시 S21 배터리 교체 가능 매장 기준</span>
+    </div>
+
+    <div class="card shop">
+      <div>
+        <b>폰닥터 아주대점</b><br>
+        <span class="mini">⭐ 4.8 · 정문 도보 3분</span><br>
+        <b style="color:#0B7A32;">₩65,000~₩80,000</b>
+      </div>
+      <button onclick="renderDone()">예약</button>
+    </div>
+
+    <div class="card shop">
+      <div>
+        <b>스마트픽스 원천점</b><br>
+        <span class="mini">⭐ 4.6 · 아주대역 도보 5분</span><br>
+        <b style="color:#0B7A32;">₩70,000~₩85,000</b>
+      </div>
+      <button onclick="renderDone()">예약</button>
+    </div>
+
+    <div class="card shop">
+      <div>
+        <b>리페어랩 수원원천점</b><br>
+        <span class="mini">⭐ 4.5 · 원천동 카페거리</span><br>
+        <b style="color:#0B7A32;">₩60,000~₩75,000</b>
+      </div>
+      <button onclick="renderDone()">예약</button>
+    </div>
+  `;
+}
+
+function renderDone(){
+  app.innerHTML = `
+    ${topBar("예약 완료", "renderShops()")}
+    <div class="result" style="margin-top:80px;">
+      <div class="icon">✅</div>
+      <h1>수리 예약이<br>완료되었습니다</h1>
+      <p>수리 후 후기를 남기면 포인트와 친환경 배지를 받을 수 있습니다.</p>
+    </div>
+    <button class="cta" onclick="renderHome()">처음으로 돌아가기</button>
+  `;
+}
+
+renderHome();
+</script>
+</body>
+</html>
