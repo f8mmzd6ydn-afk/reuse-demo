@@ -1,0 +1,183 @@
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Re:use 앱 체험형 프로토타입</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #eef6ef;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .phone {
+      width: 390px;
+      height: 780px;
+      background: #fff;
+      border-radius: 34px;
+      border: 10px solid #111;
+      box-shadow: 0 18px 50px rgba(0,0,0,.25);
+      overflow: hidden;
+      position: relative;
+    }
+    .screen { padding: 28px 22px 86px; height: 100%; overflow-y: auto; }
+    .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .logo { color:#08752e; font-size:28px; font-weight:800; }
+    .title { font-size:25px; font-weight:800; margin: 14px 0 8px; }
+    .sub { color:#555; font-size:14px; line-height:1.55; }
+    .search { margin:20px 0; border:1px solid #ddd; border-radius:14px; padding:14px; color:#777; display:flex; justify-content:space-between; }
+    .grid { display:grid; grid-template-columns: repeat(2,1fr); gap:12px; }
+    .btn, button { border:0; border-radius:14px; padding:15px; background:#0b7a32; color:white; font-weight:700; cursor:pointer; font-size:15px; }
+    .outline { background:#fff; color:#0b7a32; border:1px solid #0b7a32; }
+    .card { background:#fff; border:1px solid #e2e2e2; border-radius:18px; padding:16px; margin:12px 0; box-shadow:0 4px 14px rgba(0,0,0,.04); }
+    .product { display:flex; gap:14px; align-items:center; }
+    .thumb { width:58px; height:70px; background:#eef1f4; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:32px; }
+    .score { margin-left:auto; width:64px; height:64px; border:7px solid #14813a; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#111; }
+    .pill { display:inline-block; background:#e7f5ea; color:#0b7a32; padding:5px 9px; border-radius:999px; font-size:12px; margin-top:5px; }
+    .bigScore { text-align:center; font-size:58px; font-weight:900; color:#0b7a32; }
+    .option { padding:16px; border:1px solid #ddd; border-radius:14px; margin:10px 0; cursor:pointer; }
+    .option.active { border:2px solid #0b7a32; background:#f1fbf3; }
+    .result { text-align:center; padding:18px; background:#f1fbf3; border-radius:18px; margin:14px 0; }
+    .barWrap { display:flex; align-items:end; gap:28px; justify-content:center; height:190px; margin:20px 0; }
+    .bar { width:80px; background:#ddd; border-radius:8px 8px 0 0; display:flex; align-items:start; justify-content:center; padding-top:10px; font-weight:700; }
+    .bar.green { background:#16813a; color:white; height:115px; }
+    .bar.gray { height:175px; }
+    .nav { position:absolute; bottom:0; left:0; right:0; height:68px; background:#fff; border-top:1px solid #eee; display:flex; justify-content:space-around; align-items:center; font-size:12px; color:#777; }
+    .nav div.active { color:#0b7a32; font-weight:800; }
+    .row { display:flex; justify-content:space-between; gap:10px; }
+    .small { font-size:13px; color:#555; }
+    .shop { display:flex; justify-content:space-between; align-items:center; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="screen" id="app"></div>
+    <div class="nav">
+      <div>홈</div><div class="active">검색</div><div>진단하기</div><div>수리점</div><div>마이페이지</div>
+    </div>
+  </div>
+
+<script>
+let selectedProblem = "전원이 켜지지 않아요";
+const app = document.getElementById("app");
+
+function renderHome(){
+  app.innerHTML = `
+    <div class="top"><div class="logo">Re:use</div><div>🔔</div></div>
+    <div class="title">제품을 검색해보세요</div>
+    <div class="sub">제품명 또는 모델명을 입력하거나 바코드로 스캔하여 수리 가능성을 확인할 수 있습니다.</div>
+    <div class="search">🔍 갤럭시 S21 검색 <span>⌗</span></div>
+    <div class="grid">
+      <button onclick="renderProduct()">제품명으로 찾기</button>
+      <button class="outline" onclick="renderProduct()">바코드 스캔</button>
+    </div>
+    <h3>인기 제품</h3>
+    <div class="card product" onclick="renderProduct()">
+      <div class="thumb">📱</div>
+      <div><b>갤럭시 S21</b><br><span class="small">SM-G991N · 2021.01 출시</span><br><span class="pill">수리 가능</span></div>
+      <div class="score">85</div>
+    </div>
+    <div class="card product">
+      <div class="thumb">💻</div>
+      <div><b>맥북 에어 M1</b><br><span class="small">A2337 · 2020.11 출시</span><br><span class="pill">수리 가능</span></div>
+      <div class="score">78</div>
+    </div>
+    <div class="card product">
+      <div class="thumb">🎧</div>
+      <div><b>에어팟 프로 2세대</b><br><span class="small">A3048 · 2022.09 출시</span><br><span class="pill">수리 가능</span></div>
+      <div class="score">82</div>
+    </div>`;
+}
+
+function renderProduct(){
+  app.innerHTML = `
+    <div class="top"><button class="outline" onclick="renderHome()">←</button><b>제품 개요</b><span>공유</span></div>
+    <div class="product">
+      <div class="thumb">📱</div>
+      <div><b style="font-size:22px">갤럭시 S21</b><br><span class="small">SM-G991N · 삼성전자</span></div>
+    </div>
+    <div class="card"><div class="bigScore">85<span style="font-size:24px">/100</span></div><p style="text-align:center">수리 용이성이 높은 제품입니다.</p></div>
+    <div class="grid">
+      <div class="card"><b>부품 공급</b><br><span class="logo">8년</span></div>
+      <div class="card"><b>평균 수리비</b><br><span class="logo">₩78,000</span></div>
+      <div class="card"><b>예상 수명</b><br><span class="logo">5~6년</span></div>
+      <div class="card"><b>수리 난이도</b><br><span class="logo">보통</span></div>
+    </div>
+    <button onclick="renderDiagnosis()" style="width:100%; margin-top:14px">자가 진단 시작하기</button>`;
+}
+
+function renderDiagnosis(){
+  const problems = ["전원이 켜지지 않아요","충전이 되지 않아요","화면이 깨졌어요","소리가 나지 않아요","기기가 너무 뜨거워요","네트워크 연결이 안 돼요"];
+  app.innerHTML = `
+    <div class="top"><button class="outline" onclick="renderProduct()">←</button><b>문제 진단</b><span>1/5</span></div>
+    <div class="title">어떤 문제가 발생했나요?</div>
+    <div class="sub">해당 증상을 선택해주세요.</div>
+    ${problems.map(p => `<div class="option ${p===selectedProblem?'active':''}" onclick="selectedProblem='${p}'; renderDiagnosis()"> ${p} ${p===selectedProblem?'✅':''}</div>`).join("")}
+    <button onclick="renderResult()" style="width:100%; margin-top:18px">다음</button>`;
+}
+
+function renderResult(){
+  app.innerHTML = `
+    <div class="top"><button class="outline" onclick="renderDiagnosis()">←</button><b>진단 결과</b><span>↗</span></div>
+    <div class="result"><h2>진단이 완료되었습니다!</h2><p>예상 원인: <b>배터리 성능 저하</b></p></div>
+    <div class="card"><h3>예상 고장 부품</h3><p>배터리 가능성 <b style="color:#0b7a32">85%</b></p><p>충전 포트 가능성 10%</p><p>기타 부품 가능성 5%</p></div>
+    <div class="card"><h3>예상 수리비</h3><div class="logo">₩65,000 ~ ₩85,000</div><p class="small">평균 ₩75,000</p></div>
+    <button onclick="renderCompare()" style="width:100%">수리 vs 구매 비교</button>`;
+}
+
+function renderCompare(){
+  app.innerHTML = `
+    <div class="top"><button class="outline" onclick="renderResult()">←</button><b>수리 vs 구매 비교</b><span></span></div>
+    <div class="row">
+      <div class="card" style="flex:1"><h3>수리</h3><div class="logo">₩75,000</div><p>추가 사용 약 2.5년</p></div>
+      <div class="card" style="flex:1"><h3>새 제품</h3><div class="logo">₩930,000</div><p>예상 사용 4~5년</p></div>
+    </div>
+    <div class="result"><h2>수리 선택 시 약 855,000원 절약 가능</h2><p>현재는 수리가 더 경제적입니다.</p></div>
+    <button onclick="renderEnv()" style="width:100%">환경 영향 보기</button>`;
+}
+
+function renderEnv(){
+  app.innerHTML = `
+    <div class="top"><button class="outline" onclick="renderCompare()">←</button><b>환경 영향</b><span>↗</span></div>
+    <div class="title" style="text-align:center">탄소배출 35% 감소</div>
+    <div class="sub" style="text-align:center">새 제품 구매 대비 약 32kg CO₂eq 절감</div>
+    <div class="barWrap">
+      <div><div class="bar gray">91kg</div><p>새 제품 구매</p></div>
+      <div><div class="bar green">59kg</div><p>수리 시</p></div>
+    </div>
+    <div class="grid">
+      <div class="card">🌳<br><b>나무 2.3그루</b><br>심는 효과</div>
+      <div class="card">💧<br><b>물 320L</b><br>절약 효과</div>
+      <div class="card">🗑️<br><b>전자폐기물 1.2kg</b><br>감소 효과</div>
+      <div class="card">⚡<br><b>에너지 140kWh</b><br>절감</div>
+    </div>
+    <button onclick="renderShops()" style="width:100%">수리점 찾기</button>`;
+}
+
+function renderShops(){
+  app.innerHTML = `
+    <div class="top"><button class="outline" onclick="renderEnv()">←</button><b>수리점 찾기</b><span>내 위치</span></div>
+    <div class="card">📍 아주대학교 주변 수리점<br><span class="small">갤럭시 S21 배터리 교체 가능</span></div>
+    <div class="card shop"><div><b>폰닥터 아주대점</b><br>⭐ 4.8 · 정문 도보 3분<br>₩65,000~₩80,000</div><button>예약</button></div>
+    <div class="card shop"><div><b>스마트픽스 원천점</b><br>⭐ 4.6 · 아주대역 도보 5분<br>₩70,000~₩85,000</div><button>예약</button></div>
+    <div class="card shop"><div><b>리페어랩 수원원천점</b><br>⭐ 4.5 · 원천동 카페거리<br>₩60,000~₩75,000</div><button>예약</button></div>
+    <button onclick="renderHome()" class="outline" style="width:100%">처음으로</button>`;
+}
+
+renderHome();
+</script>
+</body>
+</html>
+"""
+
+path = Path("/mnt/data/reuse_interactive_prototype.html")
+path.write_text(html, encoding="utf-8")
+print(path)
